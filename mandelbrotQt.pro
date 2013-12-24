@@ -22,6 +22,10 @@ HEADERS  += \
     renderthread.h \
     mandelbrotcl.h
 
-INCLUDEPATH += "C:/Program Files (x86)/Intel/OpenCL SDK/3.0/include"
-
-win32:LIBS += "C:/Program Files (x86)/Intel/OpenCL SDK/3.0/lib/x86/OpenCL.lib"
+win32 {
+	INCLUDEPATH += "C:/Program Files (x86)/Intel/OpenCL SDK/3.0/include"
+	LIBS += "C:/Program Files (x86)/Intel/OpenCL SDK/3.0/lib/x86/OpenCL.lib"
+}
+!win32 {
+	LIBS += "-lOpenCL"
+}

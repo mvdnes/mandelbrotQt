@@ -102,69 +102,17 @@ void RenderThread::run()
 
         QImage image(resultSize, QImage::Format_RGB32);
 
-        const int NumPasses = 4;
-        int pass = 0;
-
         MandelBrotCL mbcl;
         mbcl.setColorMap(colormap, ColormapSize);
         if (!mbcl.setDefaultDevice()) return;
 
-        pass = NumPasses - 1;
-        while (pass < NumPasses) {
-            const int MaxIterations = (1 << (2 * pass + 6)) + 32;
-            const int Limit = 4;
-            bool allBlack = true;
+		const int pass = 4;
+        const int MaxIterations = (1 << (2 * pass + 6)) + 32;
 
-            mbcl.requestRender(resultSize.width(), resultSize.height(), scaleFactor, centerX, centerY, MaxIterations, reinterpret_cast<uint*>(image.bits()));
-            if (abort) return;
+        if (abort) return;
+        mbcl.requestRender(resultSize.width(), resultSize.height(), scaleFactor, centerX, centerY, MaxIterations, reinterpret_cast<uint*>(image.bits()));
 
-            /*for (int y = -halfHeight; y < halfHeight; ++y) {
-                if (restart)
-                    break;
-                if (abort)
-                    return;
-
-                uint *scanLine =
-                        reinterpret_cast<uint *>(image.scanLine(y + halfHeight));
-                double ay = centerY + (y * scaleFactor);
-
-                for (int x = -halfWidth; x < halfWidth; ++x) {
-                    double ax = centerX + (x * scaleFactor);
-                    double a1 = ax;
-                    double b1 = ay;
-                    int numIterations = 0;
-
-                    do {
-                        ++numIterations;
-                        double a2 = (a1 * a1) - (b1 * b1) + ax;
-                        double b2 = (2 * a1 * b1) + ay;
-                        if ((a2 * a2) + (b2 * b2) > Limit)
-                            break;
-
-                        ++numIterations;
-                        a1 = (a2 * a2) - (b2 * b2) + ax;
-                        b1 = (2 * a2 * b2) + ay;
-                        if ((a1 * a1) + (b1 * b1) > Limit)
-                            break;
-                    } while (numIterations < MaxIterations);
-
-                    if (numIterations < MaxIterations) {
-                        *scanLine++ = colormap[numIterations % ColormapSize];
-                        allBlack = false;
-                    } else {
-                        *scanLine++ = qRgb(0, 0, 0);
-                    }
-                }
-            }*/
-
-            if (allBlack && pass == 0) {
-                pass = 4;
-            } else {
-                if (!restart)
-                    emit renderedImage(image, scaleFactor);
-                ++pass;
-            }
-        }
+        if (!restart) emit renderedImage(image, scaleFactor);
 
         mutex.lock();
         if (!restart)

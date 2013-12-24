@@ -15,6 +15,7 @@ bool MandelBrotCL::setDefaultDevice() {
 
     this->devices.clear();
     platformList[0].getDevices(CL_DEVICE_TYPE_GPU, &(this->devices));
+	if (this->devices.size() == 0) return false;
 
     return buildProgram();
 }
