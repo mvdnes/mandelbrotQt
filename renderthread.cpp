@@ -41,7 +41,7 @@
 #include "renderthread.h"
 #include "mandelbrotcl.h"
 
-#include <QtWidgets>
+#include <QImage>
 
 #include <math.h>
 
@@ -106,11 +106,8 @@ void RenderThread::run()
         mbcl.setColorMap(colormap, ColormapSize);
         if (!mbcl.setDefaultDevice()) return;
 
-		const int pass = 4;
-        const int MaxIterations = (1 << (2 * pass + 6)) + 32;
-
         if (abort) return;
-        mbcl.requestRender(resultSize.width(), resultSize.height(), scaleFactor, centerX, centerY, MaxIterations, reinterpret_cast<uint*>(image.bits()));
+        mbcl.requestRender(resultSize.width(), resultSize.height(), scaleFactor, centerX, centerY, 500, reinterpret_cast<uint*>(image.bits()));
 
         if (!restart) emit renderedImage(image, scaleFactor);
 
